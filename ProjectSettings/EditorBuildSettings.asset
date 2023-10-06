@@ -13,3 +13,4 @@ EditorBuildSettings:
     guid: 1905e9c86e33940a5825dea34a823d94
   m_configObjects:
     com.htc.upm.wave.xrsdk.xrsettings: {fileID: 11400000, guid: d8d40172b16017141a4fb183deb0e03e, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 8be3e071a8210884d95e0c322a92d216, type: 2}
