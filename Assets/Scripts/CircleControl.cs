@@ -4,7 +4,13 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.XR;
+using Wave.OpenXR;
 
+public class LogMessage
+{
+    public string message;
+}
 
 public class CircleControl : MonoBehaviour
 {
@@ -14,6 +20,7 @@ public class CircleControl : MonoBehaviour
     public GameObject circle_right;
     public GameObject circle_left;
     public GameObject StartWords;
+    public GameObject EndWords;
 
 
     public Material material1;
@@ -24,7 +31,12 @@ public class CircleControl : MonoBehaviour
     private string RoundSetPath;
     private string RoundSet;
 
-    
+    bool _gameStart = false;
+
+    public DataManager _dataManager; 
+    public LogMessage _logMessage = new LogMessage();
+
+
     private void Start()
     {
         /*  I dont know how to set
@@ -42,7 +54,8 @@ public class CircleControl : MonoBehaviour
 
 
         //Round set output path
-        RoundSetPath = $"{Application.dataPath}/Output.csv";
+        //RoundSetPath = $"{Application.dataPath}/Output.csv";
+
 
         //set init material
         //circle_center.GetComponent<Renderer>().material = material1;
@@ -51,59 +64,87 @@ public class CircleControl : MonoBehaviour
         {
             circle_center.GetComponent<Renderer>().material = material1;
         }*/
-        StartCoroutine(ShowAndHideUI());
+        //StartCoroutine(ShowAndHideUI());
         
 
     }
 
+    private void Update()
+    {
+        if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton) && !_gameStart)
+        {
+            _gameStart = true;
+            StartCoroutine(ShowAndHideUI());
+        }
+    }
+
     private IEnumerator ShowAndHideUI()
     {
-        //AnyKey to start
-        if (Input.anyKeyDown)
-        {
+        //press right controller trigger to start
+        //if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton))
+        //{
+            PlayerPrefs.SetInt("GetData", 1);
             //turn off intro view
             intro.SetActive(false);
 
-            StreamWriter streamWriter = File.CreateText(RoundSetPath);
+            //StreamWriter streamWriter = File.CreateText(RoundSetPath);
             while (count <= 188)
             {
-                //output message: round detail
-                RoundSet = $"round {count}:\n";
+            //first 8 round are traning
+            if (count == 8)
+            {
+                //message for traning finished 
+                _logMessage.message = "practice over";
+                _dataManager.SaveLogMessage(_logMessage);
+                StartWords.SetActive(true);
+                yield return new WaitForSeconds(10);
+                StartWords.SetActive(false);
+                yield return new WaitForSeconds(2);
+            }
 
-                //first 8 round are traning
-                if (count == 8)
-                {
-                    //message for traning finished 
-                    StartWords.SetActive(true);
-                    yield return new WaitForSeconds(10f);
-                    StartWords.SetActive(false);
-                    yield return new WaitForSeconds(2.0f);
+            //output message: round detail
+            RoundSet = $"round {count}:\n";
+            _logMessage.message = "round" + count.ToString() + " start";
+            _dataManager.SaveLogMessage(_logMessage);
 
-                }
+            
+            
                 //color choose
                 if (Random.Range(0, 2) == 0)
                 {
-                    circle_center.GetComponent<Renderer>().material = material1;
+                    circle_center.GetComponent<RawImage>().material = material1;
+                    _logMessage.message = "indicator color: purple";
+                    _dataManager.SaveLogMessage(_logMessage);
                     RoundSet += "color :purple ,";
                 }
                 else
                 {
-                    circle_center.GetComponent<Renderer>().material = material2;
+                    circle_center.GetComponent<RawImage>().material = material2;
+                    _logMessage.message = "indicator color: brown";
+                    _dataManager.SaveLogMessage(_logMessage);
                     RoundSet += "color :brown ,";
                 }
 
                 //crosshair
                 Crosshair.SetActive(true);
-                yield return new WaitForSeconds(1.0f);
+                _logMessage.message = "crosshair showing";
+                _dataManager.SaveLogMessage(_logMessage);
+                yield return new WaitForSeconds(1);
 
                 Crosshair.SetActive(false);
+                _logMessage.message = "crosshair hiding";
+                 _dataManager.SaveLogMessage(_logMessage);
                 yield return new WaitForSeconds(0.2f);
 
                 //center dot
                 circle_center.SetActive(true);
+                _logMessage.message = "indicator showing";
+                _dataManager.SaveLogMessage(_logMessage);
                 yield return new WaitForSeconds(1.0f);
 
                 circle_center.SetActive(false);
+                _logMessage.message = "indicator hiding";
+                _dataManager.SaveLogMessage(_logMessage);
                 yield return new WaitForSeconds(0.2f);
 
                 //////////////////
@@ -114,33 +155,54 @@ public class CircleControl : MonoBehaviour
                 {
                     Debug.Log("Displaying rightObject");
                     circle_right.SetActive(true);
+                    _logMessage.message = "target showing: right";
+                    _dataManager.SaveLogMessage(_logMessage);
                     RoundSet += "position :right\n";
 
                     //output to console
                     Debug.Log(RoundSet);
 
-                    if (circle_center.GetComponent<Renderer>().material == material1)
+                    if (circle_center.GetComponent<RawImage>().material == material1)
+                    {
                         Debug.Log("should RIGHT\n");
+                        _logMessage.message = "answer: right";
+                        _dataManager.SaveLogMessage(_logMessage);
+                    }
                     else
+                    {
                         Debug.Log("should LEFT\n");
+                        _logMessage.message = "answer: left";
+                        _dataManager.SaveLogMessage(_logMessage);
+                    }   
+                        
                 }
                 else
                 {
                     Debug.Log("Displaying leftObject");
                     circle_left.SetActive(true);
+                    _logMessage.message = "target showing: left";
+                    _dataManager.SaveLogMessage(_logMessage);
                     RoundSet += "position :left\n";
 
                     //output to console
                     Debug.Log(RoundSet);
 
-                    if (circle_center.GetComponent<Renderer>().material == material1)
-                        Debug.Log("should LEFT\n");
+                    if (circle_center.GetComponent<RawImage>().material == material1)
+                    {
+                     Debug.Log("should RIGHT\n");
+                        _logMessage.message = "answer: right";
+                        _dataManager.SaveLogMessage(_logMessage);
+                    }
                     else
-                        Debug.Log("should RIGHT\n");
-                }
+                    {
+                        Debug.Log("should LEFT\n");
+                        _logMessage.message = "answer: left";
+                        _dataManager.SaveLogMessage(_logMessage);
+                    }
+            }
 
                 //message save
-                streamWriter.WriteLine(RoundSet);
+                //streamWriter.WriteLine(RoundSet);
 
 
 
@@ -148,14 +210,22 @@ public class CircleControl : MonoBehaviour
 
                 circle_right.SetActive(false);
                 circle_left.SetActive(false);
+                _logMessage.message = "target hiding, round " + count.ToString() + " over";
+                _dataManager.SaveLogMessage(_logMessage);
 
-                yield return new WaitForSeconds(1.0f);
+                 yield return new WaitForSeconds(1.0f);
 
                 //next round
                 count++;
 
             }
-            streamWriter.Close();
+            //streamWriter.Close();
+            if(count == 188)
+        {
+            PlayerPrefs.SetInt("GetData", 0);
+            EndWords.SetActive(true);
         }
+                
+        //}
     }
 }
