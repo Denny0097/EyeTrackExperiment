@@ -35,6 +35,10 @@ public class CircleControl : MonoBehaviour
 
     public DataManager _dataManager; 
     public LogMessage _logMessage = new LogMessage();
+    public LogMessage _crossMessage = new LogMessage();
+    public LogMessage _dotMessage = new LogMessage();
+    public LogMessage _LRMessage = new LogMessage();
+
 
 
     private void Start()
@@ -87,11 +91,11 @@ public class CircleControl : MonoBehaviour
             //turn off intro view
             intro.SetActive(false);
 
-            //StreamWriter streamWriter = File.CreateText(RoundSetPath);
-            while (count <= 188)
+        //StreamWriter streamWriter = File.CreateText(RoundSetPath);
+        while (count <= 188)
             {
             //first 8 round are traning
-            if (count == 8)
+            if (count == 9)
             {
                 //message for traning finished 
                 _logMessage.message = "practice over";
@@ -103,102 +107,98 @@ public class CircleControl : MonoBehaviour
             }
 
             //output message: round detail
-            RoundSet = $"round {count}:\n";
+            
             _logMessage.message = "round" + count.ToString() + " start";
             _dataManager.SaveLogMessage(_logMessage);
 
             
             
-                //color choose
-                if (Random.Range(0, 2) == 0)
+            //color choose
+            if (Random.Range(0, 2) == 0)
+            {
+                circle_center.GetComponent<RawImage>().material = material1;
+                _logMessage.message = "indicator color: purple";
+                _dataManager.SaveLogMessage(_logMessage);
+                
+            }
+            else
+            {
+                circle_center.GetComponent<RawImage>().material = material2;
+                _logMessage.message = "indicator color: brown";
+                _dataManager.SaveLogMessage(_logMessage);
+
+            }
+
+            //crosshair
+            //!!!!
+
+            //測試setactive的跟show string的時間
+            //save可以往後拉 避免多餘時間cost
+            //_logMessage.message = "test";
+
+            Crosshair.SetActive(true);
+            _logMessage.message = "crosshair showing";
+
+            _dataManager.SaveLogMessage(_logMessage);
+
+            yield return new WaitForSeconds(1);
+
+            Crosshair.SetActive(false);
+            _logMessage.message = "crosshair hiding";
+            _dataManager.SaveLogMessage(_logMessage);
+            yield return new WaitForSeconds(0.2f);
+
+            //center dot
+            circle_center.SetActive(true);
+            _logMessage.message = "indicator showing";
+            _dataManager.SaveLogMessage(_logMessage);
+            yield return new WaitForSeconds(1.0f);
+
+            circle_center.SetActive(false);
+            _logMessage.message = "indicator hiding";
+            _dataManager.SaveLogMessage(_logMessage);
+            yield return new WaitForSeconds(0.2f);
+
+         
+            //R or L dot :position choose
+            if (Random.Range(0, 2) == 0)
+            {
+                circle_right.SetActive(true);
+                _logMessage.message = "target showing: right";
+                _dataManager.SaveLogMessage(_logMessage);
+
+
+
+                if (circle_center.GetComponent<RawImage>().material == material1)
                 {
-                    circle_center.GetComponent<RawImage>().material = material1;
-                    _logMessage.message = "indicator color: purple";
+                    _logMessage.message = "answer: right";
                     _dataManager.SaveLogMessage(_logMessage);
-                    RoundSet += "color :purple ,";
                 }
                 else
                 {
-                    circle_center.GetComponent<RawImage>().material = material2;
-                    _logMessage.message = "indicator color: brown";
+                    _logMessage.message = "answer: left";
                     _dataManager.SaveLogMessage(_logMessage);
-                    RoundSet += "color :brown ,";
-                }
-
-                //crosshair
-                Crosshair.SetActive(true);
-                _logMessage.message = "crosshair showing";
-                _dataManager.SaveLogMessage(_logMessage);
-                yield return new WaitForSeconds(1);
-
-                Crosshair.SetActive(false);
-                _logMessage.message = "crosshair hiding";
-                 _dataManager.SaveLogMessage(_logMessage);
-                yield return new WaitForSeconds(0.2f);
-
-                //center dot
-                circle_center.SetActive(true);
-                _logMessage.message = "indicator showing";
-                _dataManager.SaveLogMessage(_logMessage);
-                yield return new WaitForSeconds(1.0f);
-
-                circle_center.SetActive(false);
-                _logMessage.message = "indicator hiding";
-                _dataManager.SaveLogMessage(_logMessage);
-                yield return new WaitForSeconds(0.2f);
-
-                //////////////////
-                //!! something is wrong !!
-                //////////////////
-                //R or L dot :position choose
-                if (Random.Range(0, 2) == 0)
-                {
-                    Debug.Log("Displaying rightObject");
-                    circle_right.SetActive(true);
-                    _logMessage.message = "target showing: right";
-                    _dataManager.SaveLogMessage(_logMessage);
-                    RoundSet += "position :right\n";
-
-                    //output to console
-                    Debug.Log(RoundSet);
-
-                    if (circle_center.GetComponent<RawImage>().material == material1)
-                    {
-                        Debug.Log("should RIGHT\n");
-                        _logMessage.message = "answer: right";
-                        _dataManager.SaveLogMessage(_logMessage);
-                    }
-                    else
-                    {
-                        Debug.Log("should LEFT\n");
-                        _logMessage.message = "answer: left";
-                        _dataManager.SaveLogMessage(_logMessage);
-                    }   
+                }   
                         
+            }
+            else
+            {
+                circle_left.SetActive(true);
+                _logMessage.message = "target showing: left";
+                _dataManager.SaveLogMessage(_logMessage);
+
+                //output to console
+
+                if (circle_center.GetComponent<RawImage>().material == material1)
+                {
+                    _logMessage.message = "answer: left";
+                    _dataManager.SaveLogMessage(_logMessage);
                 }
                 else
                 {
-                    Debug.Log("Displaying leftObject");
-                    circle_left.SetActive(true);
-                    _logMessage.message = "target showing: left";
+                    _logMessage.message = "answer: right";
                     _dataManager.SaveLogMessage(_logMessage);
-                    RoundSet += "position :left\n";
-
-                    //output to console
-                    Debug.Log(RoundSet);
-
-                    if (circle_center.GetComponent<RawImage>().material == material1)
-                    {
-                     Debug.Log("should RIGHT\n");
-                        _logMessage.message = "answer: right";
-                        _dataManager.SaveLogMessage(_logMessage);
-                    }
-                    else
-                    {
-                        Debug.Log("should LEFT\n");
-                        _logMessage.message = "answer: left";
-                        _dataManager.SaveLogMessage(_logMessage);
-                    }
+                }
             }
 
                 //message save
@@ -206,21 +206,21 @@ public class CircleControl : MonoBehaviour
 
 
 
-                yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(1.0f);
 
-                circle_right.SetActive(false);
-                circle_left.SetActive(false);
-                _logMessage.message = "target hiding, round " + count.ToString() + " over";
-                _dataManager.SaveLogMessage(_logMessage);
+            circle_right.SetActive(false);
+            circle_left.SetActive(false);
+            _logMessage.message = "target hiding, round " + count.ToString() + " over";
+            _dataManager.SaveLogMessage(_logMessage);
 
-                 yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(1.0f);
 
-                //next round
-                count++;
+            //next round
+            count++;
 
-            }
-            //streamWriter.Close();
-            if(count == 188)
+        }
+        //streamWriter.Close();
+        if(count == 189)
         {
             PlayerPrefs.SetInt("GetData", 0);
             EndWords.SetActive(true);
