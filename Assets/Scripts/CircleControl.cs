@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.XR;
 using Wave.OpenXR;
+using TMPro;
 
 public class LogMessage
 {
@@ -21,7 +22,7 @@ public class CircleControl : MonoBehaviour
     public GameObject circle_left;
     public GameObject StartWords;
     public GameObject EndWords;
-
+    public TMP_Text BreakWords;
 
     public Material material1;
     public Material material2;
@@ -32,13 +33,14 @@ public class CircleControl : MonoBehaviour
     private string RoundSet;
 
     bool _gameStart = false;
+    bool waitingforinput = false;
 
     public DataManager _dataManager; 
     public LogMessage _logMessage = new LogMessage();
-    public LogMessage _crossMessage = new LogMessage();
+    /*public LogMessage _crossMessage = new LogMessage();
     public LogMessage _dotMessage = new LogMessage();
     public LogMessage _LRMessage = new LogMessage();
-
+    */
 
 
     private void Start()
@@ -69,31 +71,63 @@ public class CircleControl : MonoBehaviour
             circle_center.GetComponent<Renderer>().material = material1;
         }*/
         //StartCoroutine(ShowAndHideUI());
+
+        
         
 
     }
 
     private void Update()
     {
-        if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton) && !_gameStart)
+
+        
+        //if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton) && !_gameStart)
+        if (Input.anyKey &&!_gameStart)
         {
             _gameStart = true;
             StartCoroutine(ShowAndHideUI());
+            
         }
+        
+
     }
+    public void UpdateText(string newText)
+    {
+        // 更新文本
+        BreakWords.text = newText;
+    }
+
+    private IEnumerator Take_A_Break()
+    {
+
+        BreakWords.text = "休息下\n已經完成" + (count - 8).ToString() + "/180\n按鍵繼續";
+        waitingforinput = true;
+
+        while (!Input.anyKey)
+            yield return null;
+
+        BreakWords.text = "";
+        waitingforinput = false;
+    }
+
+
 
     private IEnumerator ShowAndHideUI()
     {
         //press right controller trigger to start
-        //if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton))
-        //{
-            PlayerPrefs.SetInt("GetData", 1);
-            //turn off intro view
-            intro.SetActive(false);
 
-        //StreamWriter streamWriter = File.CreateText(RoundSetPath);
+        PlayerPrefs.SetInt("GetData", 1);
+
+        //turn off intro view
+        intro.SetActive(false);
+
+        _logMessage.message = "practice start";
+        _dataManager.SaveLogMessage(_logMessage);
+
         while (count <= 188)
-            {
+        {
+           
+
             //first 8 round are traning
             if (count == 9)
             {
@@ -106,20 +140,30 @@ public class CircleControl : MonoBehaviour
                 yield return new WaitForSeconds(2);
             }
 
+            if (count>9&&(count-8)%20 == 0)
+            {
+                _logMessage.message = "break time";
+                PlayerPrefs.SetInt("GetData", 0);
+
+                yield return StartCoroutine(Take_A_Break());
+
+                PlayerPrefs.SetInt("GetData", 1);
+            }
+
             //output message: round detail
-            
-            _logMessage.message = "round" + count.ToString() + " start";
+
+            _logMessage.message = "round" + (count-8).ToString() + " start";
             _dataManager.SaveLogMessage(_logMessage);
 
-            
-            
+
+
             //color choose
             if (Random.Range(0, 2) == 0)
             {
                 circle_center.GetComponent<RawImage>().material = material1;
                 _logMessage.message = "indicator color: purple";
                 _dataManager.SaveLogMessage(_logMessage);
-                
+
             }
             else
             {
@@ -130,22 +174,16 @@ public class CircleControl : MonoBehaviour
             }
 
             //crosshair
-            //!!!!
-
-            //測試setactive的跟show string的時間
-            //save可以往後拉 避免多餘時間cost
-            //_logMessage.message = "test";
-
+          
             Crosshair.SetActive(true);
             _logMessage.message = "crosshair showing";
-
             _dataManager.SaveLogMessage(_logMessage);
 
             yield return new WaitForSeconds(1);
 
             Crosshair.SetActive(false);
-            _logMessage.message = "crosshair hiding";
-            _dataManager.SaveLogMessage(_logMessage);
+            //_logMessage.message = "crosshair hiding";
+            //_dataManager.SaveLogMessage(_logMessage);
             yield return new WaitForSeconds(0.2f);
 
             //center dot
@@ -155,11 +193,11 @@ public class CircleControl : MonoBehaviour
             yield return new WaitForSeconds(1.0f);
 
             circle_center.SetActive(false);
-            _logMessage.message = "indicator hiding";
-            _dataManager.SaveLogMessage(_logMessage);
+            //_logMessage.message = "indicator hiding";
+            //_dataManager.SaveLogMessage(_logMessage);
             yield return new WaitForSeconds(0.2f);
 
-         
+
             //R or L dot :position choose
             if (Random.Range(0, 2) == 0)
             {
@@ -171,15 +209,15 @@ public class CircleControl : MonoBehaviour
 
                 if (circle_center.GetComponent<RawImage>().material == material1)
                 {
-                    _logMessage.message = "answer: right";
+                    _logMessage.message = "round" + count.ToString() + " answer: right";
                     _dataManager.SaveLogMessage(_logMessage);
                 }
                 else
                 {
-                    _logMessage.message = "answer: left";
+                    _logMessage.message = "round" + count.ToString() + " answer: left";
                     _dataManager.SaveLogMessage(_logMessage);
-                }   
-                        
+                }
+
             }
             else
             {
@@ -191,18 +229,18 @@ public class CircleControl : MonoBehaviour
 
                 if (circle_center.GetComponent<RawImage>().material == material1)
                 {
-                    _logMessage.message = "answer: left";
+                    _logMessage.message = "round" + count.ToString() + " answer: left";
                     _dataManager.SaveLogMessage(_logMessage);
                 }
                 else
                 {
-                    _logMessage.message = "answer: right";
+                    _logMessage.message = "round" + count.ToString() + " answer: right";
                     _dataManager.SaveLogMessage(_logMessage);
                 }
             }
 
-                //message save
-                //streamWriter.WriteLine(RoundSet);
+            //message save
+            //streamWriter.WriteLine(RoundSet);
 
 
 
@@ -210,7 +248,7 @@ public class CircleControl : MonoBehaviour
 
             circle_right.SetActive(false);
             circle_left.SetActive(false);
-            _logMessage.message = "target hiding, round " + count.ToString() + " over";
+            _logMessage.message = "round " + count.ToString() + " over";
             _dataManager.SaveLogMessage(_logMessage);
 
             yield return new WaitForSeconds(1.0f);
@@ -218,14 +256,18 @@ public class CircleControl : MonoBehaviour
             //next round
             count++;
 
+            //quit
+            if (count > 188)
+            {
+                EndWords.SetActive(true);
+                PlayerPrefs.SetInt("GetData", 0);
+
+                yield return new WaitForSeconds(2.0f);
+                Application.Quit();
+
         }
-        //streamWriter.Close();
-        if(count == 189)
-        {
-            PlayerPrefs.SetInt("GetData", 0);
-            EndWords.SetActive(true);
+
         }
-                
         //}
     }
 }

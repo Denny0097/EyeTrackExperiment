@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Wave.Essence.Eye;
+using Wave.XR;
+
 
 public class FocusEyeData
 {
@@ -28,7 +30,7 @@ public class FocusEyeDataManager : MonoBehaviour
 {
     public FocusEyeData GetEyeData()
     {
-        Debug.Log("geteyedata");
+        //Debug.Log("geteyedata");
         bool result = true;
         FocusEyeData data = new FocusEyeData();
 
@@ -44,6 +46,8 @@ public class FocusEyeDataManager : MonoBehaviour
         result &= EyeManager.Instance.GetRightEyeOpenness(out data.RightEyeOpenness);
         result &= EyeManager.Instance.GetRightEyePupilDiameter(out data.RightEyePupilDiameter);
         result &= EyeManager.Instance.GetRightEyePupilPositionInSensorArea(out data.RightEyePupilPositionInSensorArea);
+        
+
 
         return result ? data : null;
     }
