@@ -12,10 +12,15 @@ public class FocusEyeData
     public Vector3 CombindedEyeDirectionNormalized;
 
     //Left Eye:
+    //
     public Vector3 LeftEyeOrigin;
+    //
     public Vector3 LeftEyeDirectionNormalized;
+    //睜眼閉眼
     public float LeftEyeOpenness;
+    //瞳孔直徑
     public float LeftEyePupilDiameter;
+    //瞳孔位置
     public Vector2 LeftEyePupilPositionInSensorArea;
 
     //Right Eye:
