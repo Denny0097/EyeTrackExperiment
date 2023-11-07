@@ -15,7 +15,8 @@ public class LogMessage
 
 public class CircleControl : MonoBehaviour
 {
-    public GameObject intro;
+    public GameObject introP1;
+    public GameObject introP2;
     public GameObject Crosshair;
     public GameObject circle_center;
     public GameObject circle_right;
@@ -28,6 +29,8 @@ public class CircleControl : MonoBehaviour
     public Material material2;
 
     int count = 1;
+
+    //題數
     int quiztimes = 180;
 
 
@@ -70,7 +73,7 @@ public class CircleControl : MonoBehaviour
             circle_center.GetComponent<Renderer>().material = material1;
         }*/
         //StartCoroutine(ShowAndHideUI());
-        intro.SetActive(true);
+        introP1.SetActive(true);
         
         
 
@@ -83,6 +86,9 @@ public class CircleControl : MonoBehaviour
         if ((Input.anyKey || InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton)) && !_gameStart)
         //if (Input.anyKey &&!_gameStart)
         {
+            introP1.SetActive(false);
+            introP2.SetActive(true);
+            
             _gameStart = true;
             StartCoroutine(ShowAndHideUI());
             
@@ -100,12 +106,12 @@ public class CircleControl : MonoBehaviour
     private IEnumerator Take_A_Break()
     {
 
-        BreakWords.text = "休息下\n已經完成" + (count - 8).ToString() + "/180\n按鍵繼續";
+        BreakWords.text = "休息下\n已經完成" + (count - 8-1).ToString() + ", (剩"+quiztimes.ToString()+"題)\n按鍵繼續";
         waitingforinput = true;
 
 
         //while (!Input.anyKey)
-        while (!InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton))
+        while (!InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton) || !Input.anyKey)
             {
                 yield return null;
             }
@@ -114,16 +120,27 @@ public class CircleControl : MonoBehaviour
 
     }
 
+    private IEnumerator WaitUntilInput()
+    {
+        yield return new WaitForSeconds(2.0f);
+        while (!InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton))
+        //while (!Input.anyKey)
+        {
+            BreakWords.text = "";
+            yield return null;
+        }
 
+    }
 
     private IEnumerator ShowAndHideUI()
     {
         //press right controller trigger to start
 
-        PlayerPrefs.SetInt("GetData", 1);
-
         //turn off intro view
-        intro.SetActive(false);
+        yield return StartCoroutine(WaitUntilInput());
+        introP2.SetActive(false);
+
+        PlayerPrefs.SetInt("GetData", 1);
 
         _logMessage.message = "practice start";
         _dataManager.SaveLogMessage(_logMessage);
@@ -144,15 +161,7 @@ public class CircleControl : MonoBehaviour
                 yield return new WaitForSeconds(2);
             }
 
-            if (count>9&&(count-8)%20 == 0)
-            {
-                _logMessage.message = "break time";
-                PlayerPrefs.SetInt("GetData", 0);
-
-                yield return StartCoroutine(Take_A_Break());
-
-                PlayerPrefs.SetInt("GetData", 1);
-            }
+            
 
             //output message: round detail
 
@@ -263,7 +272,7 @@ public class CircleControl : MonoBehaviour
             count++;
 
             //quit
-            if (count > 188)
+            if (count > quiztimes)
             {
                 EndWords.SetActive(true);
                 PlayerPrefs.SetInt("GetData", 0);
@@ -272,6 +281,23 @@ public class CircleControl : MonoBehaviour
                 Application.Quit();
 
              }
+
+
+            if (count > 9 && (count - 8 - 1) % 20 == 0)
+            {
+                //暫停收集
+                PlayerPrefs.SetInt("GetData", 0);
+
+                _logMessage.message = "break time";              
+                _dataManager.SaveLogMessage(_logMessage);
+
+                yield return StartCoroutine(Take_A_Break());
+
+                _logMessage.message = "restart";
+                _dataManager.SaveLogMessage(_logMessage);
+                //開始
+                PlayerPrefs.SetInt("GetData", 1);
+            }
 
         }
         //}

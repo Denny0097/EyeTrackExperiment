@@ -16,6 +16,7 @@ public class Correaction : MonoBehaviour
     public GameObject self;
     public GameObject gamecontrol;
     private float speed;
+    public TMP_Text breakword;
 
     public DataManager CorrData;
     public LogMessage _logMessage = new LogMessage();
@@ -24,6 +25,10 @@ public class Correaction : MonoBehaviour
     int count = 1;
     float RowStep = 200;
     float ColStep = 100;
+
+    //控制模式：f:每兩秒換點 ＆ t:按左手按鈕換點
+    bool ControlMode = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -47,6 +52,17 @@ public class Correaction : MonoBehaviour
             StartCoroutine(TargetShow(currentPosition));
         }
 
+        //設定是否開啟ControlMode
+        if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Left, CommonUsages.triggerButton)&&ControlMode == false)
+        {
+            ControlMode = true;
+        }
+
+        if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Left, CommonUsages.triggerButton))
+        {
+            ControlMode = true;
+        }
+
     }
 
     private IEnumerator TargetShow(Vector3 currentPosition)
@@ -56,7 +72,7 @@ public class Correaction : MonoBehaviour
 
         while (count <= 11)
         {
-            
+
             switch (count)
             {
                 case 1:
@@ -141,6 +157,9 @@ public class Correaction : MonoBehaviour
 
         targetdot.SetActive(false);
         PlayerPrefs.SetInt("GetData", 0);
+        breakword.text = "矯正結束\n開始實驗說明";
+        yield return new WaitForSeconds(4.0f);
+        breakword.text = "";
         gamecontrol.SetActive(true);
         self.SetActive(false);
 
