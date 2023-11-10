@@ -13,7 +13,7 @@ public class DataManager : MonoBehaviour
 
     public class LabDataWrapper
     {
-        public DateTime time { get; set; } = DateTime.Now;
+        public string time { get; set; } = DateTime.Now.ToString("yyyyMMdd:HH:mm:ss:ffffff");
         public object data { get; set; }
     }
 

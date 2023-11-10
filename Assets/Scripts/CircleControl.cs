@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.XR;
 using Wave.OpenXR;
 using TMPro;
+using Wave.Essence.Eye;
 
 public class LogMessage
 {
@@ -44,6 +45,7 @@ public class CircleControl : MonoBehaviour
     public LogMessage _LRMessage = new LogMessage();
     */
 
+    bool isGazeMid = false;
 
     private void Start()
     {
@@ -193,8 +195,8 @@ public class CircleControl : MonoBehaviour
             Crosshair.SetActive(true);
             _logMessage.message = "crosshair showing";
             _dataManager.SaveLogMessage(_logMessage);
-
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(.5f);
+            yield return StartCoroutine(WaitGazeMid());
 
             Crosshair.SetActive(false);
             //_logMessage.message = "crosshair hiding";
@@ -336,6 +338,35 @@ public class CircleControl : MonoBehaviour
 
             PlayerPrefs.SetInt("GetData", 0);
             yield return null;
+        }
+    }
+
+    private IEnumerator WaitGazeMid()
+    {
+        IsGazeMid();
+        while (!isGazeMid)
+        {
+            yield return new WaitForSeconds(1f);
+            IsGazeMid();
+        }
+        yield return null;
+    }
+
+    private void IsGazeMid()
+    {
+        FocusEyeData data = new FocusEyeData();
+        EyeManager.Instance.GetLeftEyePupilPositionInSensorArea(out data.LeftEyePupilPositionInSensorArea);
+        EyeManager.Instance.GetRightEyePupilPositionInSensorArea(out data.RightEyePupilPositionInSensorArea);
+        if (data.LeftEyePupilPositionInSensorArea.x > 0.46 
+            && data.LeftEyePupilPositionInSensorArea.x < 0.54
+            && data.RightEyePupilPositionInSensorArea.x > 0.46
+            && data.RightEyePupilPositionInSensorArea.x < 0.54)
+        {
+            isGazeMid = true;
+        }
+        else
+        {
+            isGazeMid = false;
         }
     }
 }
