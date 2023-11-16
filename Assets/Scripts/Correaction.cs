@@ -24,7 +24,8 @@ public class Correaction : MonoBehaviour
     bool _CorreactionStart = false;
     int count = 1;
     float RowStep = 200;
-    float ColStep = 100;
+    float ColStep = 200;
+    float canvas_dist = 100;
 
     //控制模式：f:每兩秒換點 ＆ t:按左手按鈕換點
     bool ControlMode = false;
@@ -76,68 +77,68 @@ public class Correaction : MonoBehaviour
             switch (count)
             {
                 case 1:
-                    _logMessage.message = "dot position(200,0,50), right";
+                    _logMessage.message = "dot position(" + RowStep.ToString() + ",0," + canvas_dist.ToString() + "), right";
                     CorrData.SaveLogMessage(_logMessage);
                     yield return null;
                     break;
                 case 2:
                     target.anchoredPosition = new Vector3(-RowStep, 0, 0);
-                    _logMessage.message = "dot position(-200,0,50), left";
+                    _logMessage.message = "dot position(-" + RowStep.ToString() + ",0," + canvas_dist.ToString() + "), left";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 3:
                     target.anchoredPosition = new Vector3(0, ColStep, 0);
-                    _logMessage.message = "dot position(0,100,50), top";
+                    _logMessage.message = "dot position(0," + ColStep.ToString() + "," + canvas_dist.ToString() + "), top";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 4:
                     target.anchoredPosition = new Vector3(0, -ColStep, 0);
-                    _logMessage.message = "dot position(0,-100,50), buttom";
+                    _logMessage.message = "dot position(0,-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), buttom";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 5:
                     target.anchoredPosition = new Vector3(RowStep, ColStep, 0);
-                    _logMessage.message = "dot position(200,100,50), upper right";
+                    _logMessage.message = "dot position(" + RowStep.ToString() + "," + ColStep.ToString() + "," + canvas_dist.ToString() + "), upper right";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 6:
                     target.anchoredPosition = new Vector3(RowStep, -ColStep, 0);
-                    _logMessage.message = "dot position(200,-100,50), lower right";
+                    _logMessage.message = "dot position(" + RowStep.ToString() + ",-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), lower right";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 7:
                     target.anchoredPosition = new Vector3(-RowStep, ColStep, 0);
-                    _logMessage.message = "dot position(-200,100,50), upper left";
+                    _logMessage.message = "dot position(-" + RowStep.ToString() + "," + ColStep.ToString() + "," + canvas_dist.ToString() + "), upper left";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 8:
                     target.anchoredPosition = new Vector3(-RowStep, -ColStep, 0);
-                    _logMessage.message = "dot position(-200,-100,50), lower left";
+                    _logMessage.message = "dot position(-" + RowStep.ToString() + ",-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), lower left";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 9:
                     target.anchoredPosition = new Vector3(0, 0, 0);
-                    _logMessage.message = "dot position(0,0,50), center";
+                    _logMessage.message = "dot position(0,0," + canvas_dist.ToString() + "), center";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
 
                 case 10:
                     target.anchoredPosition = new Vector3(150, 0, 0);
-                    _logMessage.message = "dot position(150,0,50), GameTarget_Right";
+                    _logMessage.message = "dot position(150,0," + canvas_dist.ToString() + "), GameTarget_Right";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 11:
                     target.anchoredPosition = new Vector3(-150, 0, 0);
-                    _logMessage.message = "dot position(-100,0,50), GameTarget_Left";
+                    _logMessage.message = "dot position(-150,0," + canvas_dist.ToString() + "), GameTarget_Left";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
