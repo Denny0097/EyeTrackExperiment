@@ -131,14 +131,14 @@ public class Correaction : MonoBehaviour
                     break;
 
                 case 10:
-                    target.anchoredPosition = new Vector3(150, 0, 0);
-                    _logMessage.message = "dot position(150,0," + canvas_dist.ToString() + "), GameTarget_Right";
+                    target.anchoredPosition = new Vector3(100, 0, 0);
+                    _logMessage.message = "dot position(100,0," + canvas_dist.ToString() + "), GameTarget_Right";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 11:
-                    target.anchoredPosition = new Vector3(-150, 0, 0);
-                    _logMessage.message = "dot position(-150,0," + canvas_dist.ToString() + "), GameTarget_Left";
+                    target.anchoredPosition = new Vector3(-100, 0, 0);
+                    _logMessage.message = "dot position(-100,0," + canvas_dist.ToString() + "), GameTarget_Left";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
@@ -158,7 +158,7 @@ public class Correaction : MonoBehaviour
 
         targetdot.SetActive(false);
         PlayerPrefs.SetInt("GetData", 0);
-        breakword.text = "矯正結束\n開始實驗說明";
+        breakword.text = "矯正結束\n準備開始實驗說明\n等待期間請勿按任何按鍵";
         yield return new WaitForSeconds(4.0f);
         breakword.text = "";
         gamecontrol.SetActive(true);
