@@ -56,7 +56,7 @@ public class CircleControl : MonoBehaviour
 
     private void Start()
     {
-
+        BluetoothManager.instance.ConnectToDevice_Send("connect");
         introP1.SetActive(true);
     }
 
@@ -87,6 +87,7 @@ public class CircleControl : MonoBehaviour
         introP2.SetActive(false);
 
         PlayerPrefs.SetInt("GetData", 1);
+        BluetoothManager.instance.ConnectToDevice_Send("start");
 
         _logMessage.message = "practice start";
         _dataManager.SaveLogMessage(_logMessage);
@@ -110,10 +111,10 @@ public class CircleControl : MonoBehaviour
             }
 
             //output message: round detail
-
+            BluetoothManager.instance.ConnectToDevice_Send($"start,Round {count - 8} start.");
             _logMessage.message = "round" + (count - 8).ToString() + " start";
             _dataManager.SaveLogMessage(_logMessage);
-
+            
             Qtype = Random.Range(0, 4);
 
             while(!Roundoff)
@@ -213,6 +214,7 @@ public class CircleControl : MonoBehaviour
 
             circle_right.SetActive(false);
             circle_left.SetActive(false);
+            BluetoothManager.instance.ConnectToDevice_Send($"Round {count - 8} over.");
             _logMessage.message = "round" + (count - 8).ToString() + " over";
             _dataManager.SaveLogMessage(_logMessage);
 
@@ -237,6 +239,7 @@ public class CircleControl : MonoBehaviour
             {
                 //暫停收集
                 PlayerPrefs.SetInt("GetData", 0);
+                BluetoothManager.instance.ConnectToDevice_Send("stop");
 
                 _logMessage.message = "break time";              
                 _dataManager.SaveLogMessage(_logMessage);
@@ -249,10 +252,13 @@ public class CircleControl : MonoBehaviour
                 _dataManager.SaveLogMessage(_logMessage);
                 //開始
                 PlayerPrefs.SetInt("GetData", 1);
+                BluetoothManager.instance.ConnectToDevice_Send("start");
             }
 
         }
         //}
+        PlayerPrefs.SetInt("GetData", 0);
+        BluetoothManager.instance.ConnectToDevice_Send("stop");
     }
 
 

@@ -1,5 +1,5 @@
 {
-    "m_SelectedDeviceId": "FA38H2R00127",
+    "m_SelectedDeviceId": "R9TWA0G7TYE",
     "m_SelectedPackage": {
         "deviceId": "",
         "name": "",
@@ -12,6 +12,12 @@
             "deviceId": "FA38M2R00072",
             "name": "com.htc.vrs.launcher",
             "processId": 2368,
+            "exited": true
+        },
+        {
+            "deviceId": "FA38M2R00072",
+            "name": "com.DefaultCompany.Eyetrack_3D",
+            "processId": 9790,
             "exited": false
         }
     ],
