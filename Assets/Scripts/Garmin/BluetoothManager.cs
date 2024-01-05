@@ -38,7 +38,7 @@ public class BluetoothManager : MonoBehaviour
         if (_pluginInstance != null)
         {
             // Set Andriod device name.
-            string deviceName = "Galaxy Tab A9+";
+            string deviceName = "Galaxy S23 Ultra";
 
             if (message.Equals("connect"))
             {
