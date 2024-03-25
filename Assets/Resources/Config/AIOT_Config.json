@@ -1,0 +1,5 @@
+{
+    "Enabled": false,
+    "ServerUrl": "http://ncuaiot-dev.ap-northeast-1.elasticbeanstalk.com/",
+    "AIOTPlatformPackageName": "com.NCUVRLAB.NCUAIOT"
+}

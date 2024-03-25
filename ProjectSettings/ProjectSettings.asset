@@ -136,7 +136,9 @@ PlayerSettings:
     16:9: 1
     Others: 1
   bundleVersion: 0.1
-  preloadedAssets: []
+  preloadedAssets:
+  - {fileID: 11400000, guid: d8d40172b16017141a4fb183deb0e03e, type: 2}
+  - {fileID: 8728303228001387257, guid: 8be3e071a8210884d95e0c322a92d216, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -164,8 +166,8 @@ PlayerSettings:
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 25
-  AndroidTargetSdkVersion: 29
+  AndroidMinSdkVersion: 27
+  AndroidTargetSdkVersion: 30
   AndroidPreferredInstallLocation: 1
   aotOptions: 
   stripEngineCode: 1
@@ -808,7 +810,7 @@ PlayerSettings:
   webGLDecompressionFallback: 0
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: USE_VIVE_WAVE_XR_5_3_1
+    Android: USE_VIVE_WAVE_XR_5_3_1;USE_VIVE_ANDROID
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

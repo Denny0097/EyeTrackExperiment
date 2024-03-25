@@ -21,6 +21,8 @@
     "com.unity.ugui": "1.0.0",
     "com.unity.visualscripting": "1.9.0",
     "com.unity.xr.interaction.toolkit": "2.4.3",
+    "com.xrlab.labframe": "file:my_custom_packages/com.xrlab.labframe@0.0.15",
+    "com.xrlab.labframe_ganglion": "file:my_custom_packages/com.xrlab.labframe_ganglion@1.0.11",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
@@ -52,5 +54,14 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  }
+  },
+  "scopedRegistries": [
+    {
+      "name": "xrlab frame",
+      "url": "https://registry.npmjs.com",
+      "scopes": [
+        "com.xrlab"
+      ]
+    }
+  ]
 }

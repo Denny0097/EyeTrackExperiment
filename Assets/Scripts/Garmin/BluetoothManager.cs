@@ -14,6 +14,7 @@ public class BluetoothManager : MonoBehaviour
 
     public static BluetoothManager instance;
 
+    string incompleteData = "";
     public void IntializePlugin(string pluginName)
     {
         unityClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
@@ -23,6 +24,7 @@ public class BluetoothManager : MonoBehaviour
             Debug.Log("Plugin Error");
         _pluginInstance.CallStatic("receiveUnityActivity", unityActivity);
         _pluginInstance.Call("Initialize");
+        instance.ConnectToDevice_Send("connect");
     }
 
     /*public List<string> GetDevices()
@@ -38,7 +40,7 @@ public class BluetoothManager : MonoBehaviour
         if (_pluginInstance != null)
         {
             // Set Andriod device name.
-            string deviceName = "Galaxy S23 Ultra";
+            string deviceName = "Galaxy Tab A9+";
 
             if (message.Equals("connect"))
             {
@@ -48,6 +50,8 @@ public class BluetoothManager : MonoBehaviour
                     _receiveConnection = ConnectToDevice_Receive(deviceName);
                 }
                 connectionStatus = true;
+                //after connect start immediately
+                ConnectToDevice_Send("start");
             }
             else if (message.Equals("stop"))
             {
@@ -73,7 +77,7 @@ public class BluetoothManager : MonoBehaviour
                     /*                          *
                      * Set data receiving rate. *
                      *                          */
-                    InvokeRepeating("ReceiveData", 0, 1f);
+                    InvokeRepeating("ReceiveData", 0, .1f);
                 }
             }
             else
@@ -81,6 +85,16 @@ public class BluetoothManager : MonoBehaviour
                 Debug.Log("Send connection failed.");
             }
         }
+    }
+
+    public void SendBluetoothMessage(string message)
+    {
+        bool _messageSend = false;
+        while (!_messageSend)
+        {
+            _messageSend = _pluginInstance.Call<bool>("sendBluetoothMessage", message);
+        }
+        Debug.Log("Message send.");
     }
 
     public bool ConnectToDevice_Receive(string deviceName)
@@ -106,10 +120,12 @@ public class BluetoothManager : MonoBehaviour
 
     public void DisconnectFromDevice_Receive()
     {
+        CancelInvoke("ReceiveData");
         var _disconnection = _pluginInstance.Call<bool>("disconnectFromDevice_Receive");
         if (_disconnection)
         {
             Debug.Log("Disconnect from receive device.");
+            connectionStatus = false;
         }
         else
         {
@@ -141,8 +157,8 @@ public class BluetoothManager : MonoBehaviour
     {
         yield return null;
         var dataList = _pluginInstance.Call<string>("receiveMessage");
-        //if (!dataList.Equals("error"))
-        //    HandleReceivedData(dataList);
+        if (!dataList.Equals("error"))
+            HandleReceivedData(dataList);
     }
 
     public void HandleReceivedData(string dataList)
@@ -157,6 +173,61 @@ public class BluetoothManager : MonoBehaviour
         jsonString = jsonString.Replace("}{", "},{");
         string[] jsonStrings = jsonString.Split(new[] { "},{" }, System.StringSplitOptions.None);
 
+        // Process incomplete data.
+        int _offset = 0;
+        if (incompleteData.Length > 0)
+        {
+            string tmpJson = incompleteData + jsonStrings[0];
+            _offset = 1;
+            if (!tmpJson.StartsWith("{"))
+            {
+                tmpJson = "{" + tmpJson;
+            }
+            if (!tmpJson.EndsWith("}"))
+            {
+                tmpJson = tmpJson + "}";
+            }
+            LabGarminData data = new LabGarminData();
+            try
+            {
+                data = JsonUtility.FromJson<LabGarminData>(tmpJson);
+                if (CheckDisconnectMessage(data.tag))
+                {
+                    Debug.Log("Android device is disconnected.");
+                    DisconnectFromDevice_Receive();
+                    return dataList;
+                }
+                else
+                {
+                    labGarminData = data;
+                    Debug.Log($"HeartRate: {data.heartRate}, " +
+                        $"HeartVariability: {data.heartRateVariability}, " +
+                        $"StressLevel: {data.stressLevel}, " +
+                        $"SPO2: {data.SPO2}, " +
+                        $"Respiration: {data.respiration}, tag: {data.tag}, time: {data.time}");
+
+                    /*Debug.Log($"HeartRate: {data.heartRate}, RestingHeartRate: {data.restingHeartRate} " +
+                        $"HeartVariability: {data.heartRateVariability}, Accelerometer: {data.accelerometer_x}, " +
+                        $"{data.accelerometer_y}, {data.accelerometer_z}, Steps: {data.steps} " +
+                        $"Calories: {data.calories_Total}, {data.calories_Active}, Floors: {data.floors_Climb}, " +
+                        $"{data.floors_Descend}, IntensityMinutes: {data.intensityMinutes_Moderate}, " +
+                        $"{data.intensityMinutes_Vigorous}, StressLevel: {data.stressLevel}, " +
+                        $"SPO2: {data.SPO2}, BodyBattery: {data.bodyBattery}, " +
+                        $"Respiration: {data.respiration}, tag: {data.tag}, time: {data.time}");*/
+                    dataList.Add(data);
+                    if (PlayerPrefs.GetInt("GetData") == 1)
+                        LabDataManager.Instance.WriteData(data);
+                    incompleteData = "";
+                    Debug.Log("Incomplete data process successfully.");
+                }
+            }
+            catch
+            {
+                Debug.Log("incomplete data: " + tmpJson);
+                incompleteData = "";
+            }
+        }
+
         foreach (var jsonStr in jsonStrings)
         {
             string json = jsonStr;
@@ -168,24 +239,52 @@ public class BluetoothManager : MonoBehaviour
             {
                 json = json + "}";
             }
-            LabGarminData data = JsonUtility.FromJson<LabGarminData>(json);
-            labGarminData = data;
+            LabGarminData data = new LabGarminData();
+            try
+            {
+                data = JsonUtility.FromJson<LabGarminData>(json);
+                if (CheckDisconnectMessage(data.tag))
+                {
+                    Debug.Log("Android device is disconnected.");
+                    DisconnectFromDevice_Receive();
+                    return dataList;
+                }
+                else
+                {
+                    labGarminData = data;
 
-            Debug.Log($"HeartRate: {data.heartRate}, " +
-                $"HeartVariability: {data.heartRateVariability}, " +
-                $"StressLevel: {data.stressLevel}, " +
-                $"SPO2: {data.SPO2}, " +
-                $"Respiration: {data.respiration}, tag: {data.tag}, time: {data.time}");
+                    Debug.Log($"HeartRate: {data.heartRate}, " +
+                        $"HeartVariability: {data.heartRateVariability}, " +
+                        $"StressLevel: {data.stressLevel}, " +
+                        $"SPO2: {data.SPO2}, " +
+                        $"Respiration: {data.respiration}, tag: {data.tag}, time: {data.time}");
 
-            /*Debug.Log($"HeartRate: {data.heartRate}, RestingHeartRate: {data.restingHeartRate} " +
-                $"HeartVariability: {data.heartRateVariability}, Accelerometer: {data.accelerometer_x}, " +
-                $"{data.accelerometer_y}, {data.accelerometer_z}, Steps: {data.steps} " +
-                $"Calories: {data.calories_Total}, {data.calories_Active}, Floors: {data.floors_Climb}, " +
-                $"{data.floors_Descend}, IntensityMinutes: {data.intensityMinutes_Moderate}, " +
-                $"{data.intensityMinutes_Vigorous}, StressLevel: {data.stressLevel}, " +
-                $"SPO2: {data.SPO2}, BodyBattery: {data.bodyBattery}, " +
-                $"Respiration: {data.respiration}, tag: {data.tag}, time: {data.time}");*/
-            dataList.Add(data);
+                    /*Debug.Log($"HeartRate: {data.heartRate}, RestingHeartRate: {data.restingHeartRate} " +
+                        $"HeartVariability: {data.heartRateVariability}, Accelerometer: {data.accelerometer_x}, " +
+                        $"{data.accelerometer_y}, {data.accelerometer_z}, Steps: {data.steps} " +
+                        $"Calories: {data.calories_Total}, {data.calories_Active}, Floors: {data.floors_Climb}, " +
+                        $"{data.floors_Descend}, IntensityMinutes: {data.intensityMinutes_Moderate}, " +
+                        $"{data.intensityMinutes_Vigorous}, StressLevel: {data.stressLevel}, " +
+                        $"SPO2: {data.SPO2}, BodyBattery: {data.bodyBattery}, " +
+                        $"Respiration: {data.respiration}, tag: {data.tag}, time: {data.time}");*/
+
+                    dataList.Add(data);
+                    if (PlayerPrefs.GetInt("GetData") == 1)
+                        LabDataManager.Instance.WriteData(data);
+                }
+            }
+            catch
+            {
+                if (jsonStr.StartsWith("{"))
+                {
+                    json = json.Substring(1);
+                }
+                if (jsonStr.EndsWith("}"))
+                {
+                    json = json.Substring(0, json.Length - 1);
+                }
+                incompleteData = json;
+            }
         }
 
         return dataList;
@@ -196,6 +295,15 @@ public class BluetoothManager : MonoBehaviour
         if (!string.IsNullOrEmpty(str) && str.Length >= 5)
         {
             return str.Substring(0, 5).Equals("start");
+        }
+        return false;
+    }
+
+    bool CheckDisconnectMessage(string str)
+    {
+        if (str.Equals("device_disconnect"))
+        {
+            return true;
         }
         return false;
     }

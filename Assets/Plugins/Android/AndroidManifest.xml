@@ -9,6 +9,9 @@
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
 	<!--android 11 之後都要用MANAGE-->
+	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+	<uses-permission android:name="android.permission.WRITE_MEDIA_STORAGE"/>
+	<application android:requestLegacyExternalStorage="true"/>
 	<uses-permission android:name="android.permission.BLUETOOTH"
                      android:maxSdkVersion="30"/>
 	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
@@ -18,11 +21,11 @@
 
 	<uses-feature android:name="wave.feature.eyetracking" android:required="true" />
 
-	<application android:icon="@drawable/app_icon"
+	<!--<application android:icon="@drawable/app_icon"
                  android:label="@string/app_name"
                  android:theme="@style/Theme.WaveVR.Black"
 				 tools:replace="android:theme">
-		<!--You can use your theme here.-->>
+		--><!--You can use your theme here.--><!-->
 		<activity android:name="com.htc.vr.unity.WVRUnityVRActivity"
                   android:label="@string/app_name"
 				  android:configChanges="density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen"
@@ -35,5 +38,18 @@
 			<meta-data android:name="unityplayer.UnityActivity" android:value="true" />
 			<meta-data android:name="unityplayer.SkipPermissionsDialog" android:value="true" />
 		</activity>
+	</application>-->
+	<application android:label="@string/app_name" android:theme="@style/Theme.WaveVR.Black" android:icon="@mipmap/app_icon" tools:replace="android:icon">
+		You can use your theme here.
+		<activity android:name="com.htc.vr.unity.WVRUnityVRActivity" android:label="@string/app_name" android:configChanges="density|fontScale|keyboard|keyboardHidden|layoutDirection|locale|mnc|mcc|navigation|orientation|screenLayout|screenSize|smallestScreenSize|uiMode|touchscreen" android:enableVrMode="@string/wvr_vr_mode_component">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"/>
+				<category android:name="android.intent.category.LAUNCHER"/>
+				<category android:name="com.htc.intent.category.VRAPP"/>
+			</intent-filter>
+			<meta-data android:name="unityplayer.UnityActivity" android:value="true"/>
+			<meta-data android:name="unityplayer.SkipPermissionsDialog" android:value="true"/>
+		</activity>
 	</application>
+	
 </manifest>

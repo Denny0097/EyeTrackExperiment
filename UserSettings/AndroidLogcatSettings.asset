@@ -1,5 +1,5 @@
 {
-    "m_SelectedDeviceId": "FA38H2R00127",
+    "m_SelectedDeviceId": "PA7J10MGG7090075W",
     "m_SelectedPackage": {
         "deviceId": "",
         "name": "",
@@ -18,6 +18,18 @@
             "deviceId": "FA38M2R00072",
             "name": "com.DefaultCompany.Eyetrack_3D",
             "processId": 9790,
+            "exited": true
+        },
+        {
+            "deviceId": "FA38M2R00072",
+            "name": "com.DefaultCompany.Eyetrack_3D",
+            "processId": 5210,
+            "exited": true
+        },
+        {
+            "deviceId": "FA38M2R00072",
+            "name": "com.htc.vrs.launcher",
+            "processId": 2464,
             "exited": false
         },
         {

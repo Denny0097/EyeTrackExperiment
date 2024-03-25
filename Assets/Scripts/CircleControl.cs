@@ -8,10 +8,22 @@ using UnityEngine.XR;
 using Wave.OpenXR;
 using TMPro;
 using Wave.Essence.Eye;
+using LabFrame2023;
+using System;
 
-public class LogMessage
+[SerializeField]
+public class LogMessage: LabDataBase
 {
     public string message;
+
+    public LogMessage()
+    {
+        message = "";
+    }
+    public LogMessage(string _message)
+    {
+        message = _message;
+    }
 }
 
 public class CircleControl : MonoBehaviour
@@ -49,14 +61,16 @@ public class CircleControl : MonoBehaviour
     bool waitingforinput = false;
 
     public DataManager _dataManager; 
-    public LogMessage _logMessage = new LogMessage();
+    public static LogMessage _logMessage = new LogMessage();
     
 
     bool isGazeMid = false;
 
+    public GanglionController ganglionController;
+    public AudioSource audioSource;
+
     private void Start()
     {
-        BluetoothManager.instance.ConnectToDevice_Send("connect");
         introP1.SetActive(true);
     }
 
@@ -86,15 +100,16 @@ public class CircleControl : MonoBehaviour
 
         introP2.SetActive(false);
 
+        _logMessage.message = "practice start";
         PlayerPrefs.SetInt("GetData", 1);
         BluetoothManager.instance.ConnectToDevice_Send("start");
-
-        _logMessage.message = "practice start";
-        _dataManager.SaveLogMessage(_logMessage);
+        //EEG start.
+        GanglionManager.Instance.StreamData();
+        LabDataManager.Instance.WriteData(_logMessage);
 
         while (count <= (quiztimes + 8))
         {
-            
+
             Roundoff = false;
 
             //first 8 round are traning
@@ -102,8 +117,10 @@ public class CircleControl : MonoBehaviour
             {
                 //message for traning finished
                 Q1 = Q2 = Q3 = Q4 = 5;
-                _logMessage.message = "practice over";
-                _dataManager.SaveLogMessage(_logMessage);
+
+                _logMessage = new LogMessage("practice over");
+                LabDataManager.Instance.WriteData(_logMessage);
+
                 StartWords.SetActive(true);
                 yield return new WaitForSeconds(10);
                 StartWords.SetActive(false);
@@ -111,13 +128,12 @@ public class CircleControl : MonoBehaviour
             }
 
             //output message: round detail
-            BluetoothManager.instance.ConnectToDevice_Send($"start,Round {count - 8} start.");
-            _logMessage.message = "round" + (count - 8).ToString() + " start";
-            _dataManager.SaveLogMessage(_logMessage);
-            
-            Qtype = Random.Range(0, 4);
+            _logMessage = new LogMessage("round " + (count - 8).ToString() + " start");
+            LabDataManager.Instance.WriteData(_logMessage);
 
-            while(!Roundoff)
+            Qtype = UnityEngine.Random.Range(0, 4);
+
+            while (!Roundoff)
             {
                 switch (Qtype)
                 {
@@ -214,9 +230,8 @@ public class CircleControl : MonoBehaviour
 
             circle_right.SetActive(false);
             circle_left.SetActive(false);
-            BluetoothManager.instance.ConnectToDevice_Send($"Round {count - 8} over.");
-            _logMessage.message = "round" + (count - 8).ToString() + " over";
-            _dataManager.SaveLogMessage(_logMessage);
+            _logMessage = new LogMessage("round " + (count - 8).ToString() + " over");
+            LabDataManager.Instance.WriteData(_logMessage);
 
             yield return new WaitForSeconds(1.0f);
 
@@ -232,7 +247,7 @@ public class CircleControl : MonoBehaviour
                 yield return new WaitForSeconds(2.0f);
                 Application.Quit();
 
-             }
+            }
 
 
             if (count > 9 && (count - 8 - 1) % 20 == 0)
@@ -241,25 +256,27 @@ public class CircleControl : MonoBehaviour
                 PlayerPrefs.SetInt("GetData", 0);
                 BluetoothManager.instance.ConnectToDevice_Send("stop");
 
-                _logMessage.message = "break time";              
-                _dataManager.SaveLogMessage(_logMessage);
+                _logMessage = new LogMessage("break time");
+                LabDataManager.Instance.WriteData(_logMessage);
 
                 Q1 = Q2 = Q3 = Q4 = 5;
 
                 yield return StartCoroutine(Take_A_Break());
 
-                _logMessage.message = "restart";
-                _dataManager.SaveLogMessage(_logMessage);
+                _logMessage = new LogMessage("restart");
+                LabDataManager.Instance.WriteData(_logMessage);
                 //開始
                 PlayerPrefs.SetInt("GetData", 1);
                 BluetoothManager.instance.ConnectToDevice_Send("start");
             }
 
         }
-        //}
         PlayerPrefs.SetInt("GetData", 0);
         BluetoothManager.instance.ConnectToDevice_Send("stop");
+        BluetoothManager.instance.ConnectToDevice_Send("disconnect");
+        GanglionManager.Instance.StopStreamData();
     }
+
 
 
     private void ColorDecision(int c)
@@ -267,17 +284,39 @@ public class CircleControl : MonoBehaviour
         if(c == 0)
         {
             circle_center.GetComponent<RawImage>().material = material1;
-            _logMessage.message = "indicator color: purple";
-            _dataManager.SaveLogMessage(_logMessage);
+            _logMessage = new LogMessage("indicator color: purple");
+            LabDataManager.Instance.WriteData(_logMessage);
 
         }
         else
         {
             circle_center.GetComponent<RawImage>().material = material2;
-            _logMessage.message = "indicator color: brown";
-            _dataManager.SaveLogMessage(_logMessage);
+            _logMessage = new LogMessage("indicator color: brown");
+            LabDataManager.Instance.WriteData(_logMessage);
         }
 
+    }
+
+    IEnumerator resting()
+    {
+        GanglionManager.Instance.StreamData();
+        _logMessage.message = "open";
+        _dataManager.SaveLogMessage(_logMessage);
+        yield return new WaitForSeconds(90f);
+        audioSource.Play();
+        _logMessage.message = "closed";
+        _dataManager.SaveLogMessage(_logMessage);
+        yield return new WaitForSeconds(90f);
+        audioSource.Play();
+        _logMessage.message = "open";
+        _dataManager.SaveLogMessage(_logMessage);
+        yield return new WaitForSeconds(90f);
+        audioSource.Play();
+        _logMessage.message = "closed";
+        _dataManager.SaveLogMessage(_logMessage);
+        yield return new WaitForSeconds(90f);
+        audioSource.Play();
+        GanglionManager.Instance.StopStreamData();
     }
 
     private void TargetDecition(int t)
@@ -285,40 +324,39 @@ public class CircleControl : MonoBehaviour
         if (t == 0)
         {
             circle_right.SetActive(true);
-            _logMessage.message = "target showing: right";
-            _dataManager.SaveLogMessage(_logMessage);
-
+            _logMessage = new LogMessage("target showing: right");
+            LabDataManager.Instance.WriteData(_logMessage);
 
 
             if (circle_center.GetComponent<RawImage>().material == material1)
             {
-                _logMessage.message = "round" + (count - 8).ToString() + " answer: right";
-                _dataManager.SaveLogMessage(_logMessage);
+                _logMessage = new LogMessage("round" + (count - 8).ToString() + " answer: right");
+                LabDataManager.Instance.WriteData(_logMessage);
             }
             else
             {
-                _logMessage.message = "round" + (count - 8).ToString() + " answer: left";
-                _dataManager.SaveLogMessage(_logMessage);
+                _logMessage = new LogMessage("round" + (count - 8).ToString() + " answer: left");
+                LabDataManager.Instance.WriteData(_logMessage);
             }
 
         }
         else
         {
             circle_left.SetActive(true);
-            _logMessage.message = "target showing: left";
-            _dataManager.SaveLogMessage(_logMessage);
+            _logMessage = new LogMessage("target showing: left");
+            LabDataManager.Instance.WriteData(_logMessage);
 
             //output to console
 
             if (circle_center.GetComponent<RawImage>().material == material1)
             {
-                _logMessage.message = "round" + (count - 8).ToString() + " answer: left";
-                _dataManager.SaveLogMessage(_logMessage);
+                _logMessage = new LogMessage("round" + (count - 8).ToString() + " answer: left");
+                LabDataManager.Instance.WriteData(_logMessage);
             }
             else
             {
-                _logMessage.message = "round" + (count - 8).ToString() + " answer: right";
-                _dataManager.SaveLogMessage(_logMessage);
+                _logMessage = new LogMessage("round" + (count - 8).ToString() + " answer: right");
+                LabDataManager.Instance.WriteData(_logMessage);
             }
         }
     }
@@ -327,8 +365,10 @@ public class CircleControl : MonoBehaviour
     private IEnumerator CrosshairShow()
     {
         Crosshair.SetActive(true);
-        _logMessage.message = "crosshair showing";
-        _dataManager.SaveLogMessage(_logMessage);
+
+        _logMessage = new LogMessage("crosshair showing");
+        LabDataManager.Instance.WriteData(_logMessage);
+
         yield return new WaitForSeconds(0.5f);
 
         //確認視線回歸中心點
@@ -340,8 +380,10 @@ public class CircleControl : MonoBehaviour
 
         //center dot
         circle_center.SetActive(true);
-        _logMessage.message = "indicator showing";
-        _dataManager.SaveLogMessage(_logMessage);
+
+        _logMessage = new LogMessage("indicator showing");
+        LabDataManager.Instance.WriteData(_logMessage);
+
         yield return new WaitForSeconds(1.0f);
 
         circle_center.SetActive(false);
@@ -359,8 +401,9 @@ public class CircleControl : MonoBehaviour
 
             //R_check
             circle_right.SetActive(true);
-            _logMessage.message = "R_test";
-            _dataManager.SaveLogMessage(_logMessage);
+
+            _logMessage = new LogMessage("R_test");
+            LabDataManager.Instance.WriteData(_logMessage);
             //when active, dot move to get the user's R_origin
 
 
@@ -370,10 +413,10 @@ public class CircleControl : MonoBehaviour
 
             //L_check
             circle_left.SetActive(true);
-            _logMessage.message = "L_test";
-            _dataManager.SaveLogMessage(_logMessage);
-            //when active, dot move to get the user's L_origin
 
+            _logMessage = new LogMessage("L_test");
+            LabDataManager.Instance.WriteData(_logMessage);
+            //when active, dot move to get the user's L_origin
 
 
 

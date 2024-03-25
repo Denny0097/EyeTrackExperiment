@@ -21,7 +21,7 @@ public class DataManager : MonoBehaviour
     {
         if (PlayerPrefs.GetInt("GetData") == 1)
         {
-            SaveEyeData(_eyeDataManager.GetEyeData());
+            //SaveEyeData(_eyeDataManager.GetEyeData());
         }
     }
 
@@ -49,9 +49,9 @@ public class DataManager : MonoBehaviour
     void Start()
     {
         PlayerPrefs.SetInt("GetData", 0);
-        _saveDir = Path.Combine(Application.persistentDataPath, "Output", DateTime.Now.ToString("yyyyMMdd-hhmmss"));
+        /*_saveDir = Path.Combine(Application.persistentDataPath, "Output", DateTime.Now.ToString("yyyyMMdd-hhmmss"));
         Directory.CreateDirectory(_saveDir);
-        InvokeRepeating("SaveData", 0f, .01f); //90hz
+        InvokeRepeating("SaveData", 0f, .01f); //120hz*/
     }
 
     // Update is called once per frame

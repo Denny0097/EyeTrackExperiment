@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.XR;
 using Wave.OpenXR;
 using TMPro;
+using System;
 
 
 public class Correaction : MonoBehaviour
@@ -19,7 +20,6 @@ public class Correaction : MonoBehaviour
     public TMP_Text breakword;
 
     public DataManager CorrData;
-    public LogMessage _logMessage = new LogMessage();
 
     bool _CorreactionStart = false;
     int count = 1;
@@ -30,13 +30,18 @@ public class Correaction : MonoBehaviour
     //控制模式：f:每兩秒換點 ＆ t:按左手按鈕換點
     bool ControlMode = false;
 
+    public static string foldername;
+
     // Start is called before the first frame update
     void Start()
     {
-        instruction.SetActive(true);
-        _logMessage.message = "order of presentation : 右 左 上 下 右上 右下 左上 左下 中";
-        CorrData.SaveLogMessage(_logMessage);
+        //Set folder name.
+        foldername = DateTime.Now.ToString("MMddHHmm");
+        LabDataManager.Instance.LabDataInit(foldername);
 
+        instruction.SetActive(true);
+        CircleControl._logMessage = new LogMessage("order of presentation : 右 左 上 下 右上 右下 左上 左下 中");
+        LabDataManager.Instance.WriteData(CircleControl._logMessage);
     }
 
     // Update is called once per frame
@@ -77,69 +82,69 @@ public class Correaction : MonoBehaviour
             switch (count)
             {
                 case 1:
-                    _logMessage.message = "dot position(" + RowStep.ToString() + ",0," + canvas_dist.ToString() + "), right";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(" + RowStep.ToString() + ",0," + canvas_dist.ToString() + "), right");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
                     yield return null;
                     break;
                 case 2:
                     target.anchoredPosition = new Vector3(-RowStep, 0, 0);
-                    _logMessage.message = "dot position(-" + RowStep.ToString() + ",0," + canvas_dist.ToString() + "), left";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(-" + RowStep.ToString() + ",0," + canvas_dist.ToString() + "), left");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 3:
                     target.anchoredPosition = new Vector3(0, ColStep, 0);
-                    _logMessage.message = "dot position(0," + ColStep.ToString() + "," + canvas_dist.ToString() + "), top";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(0," + ColStep.ToString() + "," + canvas_dist.ToString() + "), top");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 4:
                     target.anchoredPosition = new Vector3(0, -ColStep, 0);
-                    _logMessage.message = "dot position(0,-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), buttom";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(0,-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), buttom");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 5:
                     target.anchoredPosition = new Vector3(RowStep, ColStep, 0);
-                    _logMessage.message = "dot position(" + RowStep.ToString() + "," + ColStep.ToString() + "," + canvas_dist.ToString() + "), upper right";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(" + RowStep.ToString() + "," + ColStep.ToString() + "," + canvas_dist.ToString() + "), upper right");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 6:
                     target.anchoredPosition = new Vector3(RowStep, -ColStep, 0);
-                    _logMessage.message = "dot position(" + RowStep.ToString() + ",-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), lower right";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(" + RowStep.ToString() + ",-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), lower right");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 7:
                     target.anchoredPosition = new Vector3(-RowStep, ColStep, 0);
-                    _logMessage.message = "dot position(-" + RowStep.ToString() + "," + ColStep.ToString() + "," + canvas_dist.ToString() + "), upper left";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(-" + RowStep.ToString() + "," + ColStep.ToString() + "," + canvas_dist.ToString() + "), upper left");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 8:
                     target.anchoredPosition = new Vector3(-RowStep, -ColStep, 0);
-                    _logMessage.message = "dot position(-" + RowStep.ToString() + ",-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), lower left";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(-" + RowStep.ToString() + ",-" + ColStep.ToString() + "," + canvas_dist.ToString() + "), lower left");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 9:
                     target.anchoredPosition = new Vector3(0, 0, 0);
-                    _logMessage.message = "dot position(0,0," + canvas_dist.ToString() + "), center";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(0,0," + canvas_dist.ToString() + "), center");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
 
                 case 10:
                     target.anchoredPosition = new Vector3(100, 0, 0);
-                    _logMessage.message = "dot position(100,0," + canvas_dist.ToString() + "), GameTarget_Right";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(100,0," + canvas_dist.ToString() + "), GameTarget_Right");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
                 case 11:
                     target.anchoredPosition = new Vector3(-100, 0, 0);
-                    _logMessage.message = "dot position(-100,0," + canvas_dist.ToString() + "), GameTarget_Left";
-                    CorrData.SaveLogMessage(_logMessage);
+                    CircleControl._logMessage = new LogMessage("dot position(-100,0," + canvas_dist.ToString() + "), GameTarget_Left");
+                    LabDataManager.Instance.WriteData(CircleControl._logMessage);
 
                     break;
 
