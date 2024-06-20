@@ -9,6 +9,10 @@ using Wave.OpenXR;
 using TMPro;
 using Wave.Essence.Eye;
 
+
+[RequireComponent(typeof(AudioSource))]
+
+
 public class LogMessage
 {
     public string message;
@@ -16,6 +20,15 @@ public class LogMessage
 
 public class CircleControl : MonoBehaviour
 {
+
+    //偵測眼睛往左或往右之函數，以combineEyeDerection的x軸來觀察
+    FocusEyeData eyeData = new FocusEyeData();
+    private FocusEyeDataManager _eyeDataManager;
+    private float Eye_X;
+
+    public AudioClip impact;
+    AudioSource audiosource;
+
     public GameObject introP1;
     public GameObject introP2;
     public GameObject Crosshair;
@@ -42,8 +55,8 @@ public class CircleControl : MonoBehaviour
     int Q4 = 2;
     int Qtype = 0;
     bool Roundoff = false;
-
-
+    //Answer
+    int ans = 0;
 
     bool _gameStart = false;
     bool waitingforinput = false;
@@ -81,7 +94,7 @@ public class CircleControl : MonoBehaviour
     {
         //press right controller trigger to start
 
-        //turn off intro view
+        //turn off introduction
         yield return StartCoroutine(WaitUntilInput());
 
         introP2.SetActive(false);
@@ -125,7 +138,7 @@ public class CircleControl : MonoBehaviour
                         if (Q1 > 0)
                         {
                             Q1--;
-                            //Centor color
+                            //Centor color : Purple
                             ColorDecision(0);
 
                             //Crosshair
@@ -146,7 +159,7 @@ public class CircleControl : MonoBehaviour
                         if (Q2 > 0)
                         {
                             Q2--;
-                            //Centor color
+                            //Centor color : Purple
                             ColorDecision(0);
 
                             //Crosshair
@@ -168,7 +181,7 @@ public class CircleControl : MonoBehaviour
                         if (Q3 > 0)
                         {
                             Q3--;
-                            //Centor color
+                            //Centor color : Brown
                             ColorDecision(1);
 
                             //Crosshair
@@ -190,13 +203,13 @@ public class CircleControl : MonoBehaviour
                         if (Q4 > 0)
                         {
                             Q4--;
-                            //Centor color
+                            //Centor color : Brown
                             ColorDecision(1);
 
                             //Crosshair
                             yield return StartCoroutine(CrosshairShow());
 
-                            //target show
+                            //target show : 
                             TargetDecition(1);
 
                             Roundoff = true;
@@ -209,8 +222,15 @@ public class CircleControl : MonoBehaviour
                 }
             }
 
-
+            
             yield return new WaitForSeconds(1.0f);
+
+
+            //偵測是否答對
+            eyeData = _eyeDataManager.GetEyeData();
+            Eye_X = eyeData.CombindedEyeDirectionNormalized.x;
+            DetectWrong(ans, Eye_X);
+
 
             circle_right.SetActive(false);
             circle_left.SetActive(false);
@@ -293,11 +313,13 @@ public class CircleControl : MonoBehaviour
             if (circle_center.GetComponent<RawImage>().material == material1)
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: right";
+                ans = 1;
                 _dataManager.SaveLogMessage(_logMessage);
             }
             else
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: left";
+                ans = 0;
                 _dataManager.SaveLogMessage(_logMessage);
             }
 
@@ -313,11 +335,13 @@ public class CircleControl : MonoBehaviour
             if (circle_center.GetComponent<RawImage>().material == material1)
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: left";
+                ans = 0;
                 _dataManager.SaveLogMessage(_logMessage);
             }
             else
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: right";
+                ans = 1;
                 _dataManager.SaveLogMessage(_logMessage);
             }
         }
@@ -447,6 +471,20 @@ public class CircleControl : MonoBehaviour
             yield return null;
         }
 
+    }
+
+
+    //錯誤發出聲音
+    void DetectWrong(int Ans, float EyeDerection)
+    {
+        if(Ans == 0 && EyeDerection >0)
+        {
+            audiosource.PlayOneShot(impact);
+        }
+        else if(Ans == 1 && EyeDerection < 0)
+        {
+            audiosource.PlayOneShot(impact);
+        }
     }
 
 }

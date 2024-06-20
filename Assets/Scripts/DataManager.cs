@@ -29,7 +29,7 @@ public class DataManager : MonoBehaviour
     {
         string datajson = JsonConvert.SerializeObject(new LabDataWrapper { data = data }, new JsonSerializerSettings()
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // §ï ignore Á×§K´`Àô¤Þ¥Î (Force ·|ª½±µ°{°h¤£³ø¿ù)
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // ï¿½ï¿½ ignore ï¿½×§Kï¿½`ï¿½ï¿½Þ¥ï¿½ (Force ï¿½|ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
             NullValueHandling = NullValueHandling.Include
         });
         File.AppendAllText(Path.Combine(_saveDir, $"EyeTrackExperiment_EyeData.json"), datajson + "\r\n");
@@ -39,7 +39,7 @@ public class DataManager : MonoBehaviour
     {
         string datajson = JsonConvert.SerializeObject(new LabDataWrapper { data = data }, new JsonSerializerSettings()
         {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // §ï ignore Á×§K´`Àô¤Þ¥Î (Force ·|ª½±µ°{°h¤£³ø¿ù)
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore, // ï¿½ï¿½ ignore ï¿½×§Kï¿½`ï¿½ï¿½Þ¥ï¿½ (Force ï¿½|ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
             NullValueHandling = NullValueHandling.Include
         });
         File.AppendAllText(Path.Combine(_saveDir, $"EyeTrackExperiment_LogMessage.json"), datajson + "\r\n");
@@ -51,7 +51,7 @@ public class DataManager : MonoBehaviour
         PlayerPrefs.SetInt("GetData", 0);
         _saveDir = Path.Combine(Application.persistentDataPath, "Output", DateTime.Now.ToString("yyyyMMdd-hhmmss"));
         Directory.CreateDirectory(_saveDir);
-        InvokeRepeating("SaveData", 0f, .01f); //90hz
+        InvokeRepeating("SaveData", 0f, .005f); //200hz
     }
 
     // Update is called once per frame
