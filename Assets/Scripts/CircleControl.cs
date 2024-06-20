@@ -29,20 +29,30 @@ public class CircleControl : MonoBehaviour
     public AudioClip impact;
     AudioSource audiosource;
 
-    public GameObject introP1;
-    public GameObject introP2;
+    public AudioSource _correctBi;
+    public AudioSource _errorBi;
+
+
+    public GameObject _initialUI;
+    public GameObject _introP1;
+    public GameObject _introP2;
     public GameObject Crosshair;
-    public GameObject circle_center;
-    public GameObject circle_right;
-    public GameObject circle_left;
-    public GameObject StartWords;
-    public GameObject EndWords;
-    public TMP_Text BreakWords;
+    public GameObject _circle_center;
+    public GameObject _circle_right;
+    public GameObject _circle_left;
+    public GameObject _startWords;
+    public GameObject _endWords;
+    public TMP_Text _breakWords;
 
     public Material material1;
     public Material material2;
 
     int count = 1;
+
+    //UI數值輸入
+    public TMP_InputField _inputTrialNum;//題數
+    public TMP_InputField _targetLocation_X;
+    public TMP_InputField _targetLocation_Y;
 
 
     //題數
@@ -59,6 +69,7 @@ public class CircleControl : MonoBehaviour
     int ans = 0;
 
     bool _gameStart = false;
+    bool _gameReady = false;
     bool waitingforinput = false;
 
     public DataManager _dataManager; 
@@ -69,18 +80,19 @@ public class CircleControl : MonoBehaviour
 
     private void Start()
     {
+        _initialUI.SetActive(true);
         BluetoothManager.instance.ConnectToDevice_Send("connect");
-        introP1.SetActive(true);
+        
     }
 
     private void Update()
     {
 
-        if ((Input.anyKey || InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton)) && !_gameStart)
+        if ((Input.anyKey || InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton)) && !_gameStart && _gameReady)
         //if (Input.anyKey &&!_gameStart)
         {
-            introP1.SetActive(false);
-            introP2.SetActive(true);
+            _introP1.SetActive(false);
+            _introP2.SetActive(true);
             
             _gameStart = true;
             StartCoroutine(ShowAndHideUI());
@@ -88,7 +100,15 @@ public class CircleControl : MonoBehaviour
         }
         
     }
-    
+
+    public void GameStart()
+    {
+        _initialUI.SetActive(false);
+        _introP1.SetActive(true);
+        _gameReady = true;
+
+    }
+
 
     private IEnumerator ShowAndHideUI()
     {
@@ -97,7 +117,7 @@ public class CircleControl : MonoBehaviour
         //turn off introduction
         yield return StartCoroutine(WaitUntilInput());
 
-        introP2.SetActive(false);
+        _introP2.SetActive(false);
 
         PlayerPrefs.SetInt("GetData", 1);
         BluetoothManager.instance.ConnectToDevice_Send("start");
@@ -117,9 +137,9 @@ public class CircleControl : MonoBehaviour
                 Q1 = Q2 = Q3 = Q4 = 5;
                 _logMessage.message = "practice over";
                 _dataManager.SaveLogMessage(_logMessage);
-                StartWords.SetActive(true);
+                _startWords.SetActive(true);
                 yield return new WaitForSeconds(10);
-                StartWords.SetActive(false);
+                _startWords.SetActive(false);
                 yield return new WaitForSeconds(2);
             }
 
@@ -232,8 +252,8 @@ public class CircleControl : MonoBehaviour
             DetectWrong(ans, Eye_X);
 
 
-            circle_right.SetActive(false);
-            circle_left.SetActive(false);
+            _circle_right.SetActive(false);
+            _circle_left.SetActive(false);
             BluetoothManager.instance.ConnectToDevice_Send($"Round {count - 8} over.");
             _logMessage.message = "round" + (count - 8).ToString() + " over";
             _dataManager.SaveLogMessage(_logMessage);
@@ -246,7 +266,7 @@ public class CircleControl : MonoBehaviour
             //quit
             if (count > quiztimes + 8)
             {
-                EndWords.SetActive(true);
+                _endWords.SetActive(true);
                 PlayerPrefs.SetInt("GetData", 0);
 
                 yield return new WaitForSeconds(2.0f);
@@ -286,14 +306,14 @@ public class CircleControl : MonoBehaviour
     {
         if(c == 0)
         {
-            circle_center.GetComponent<RawImage>().material = material1;
+            _circle_center.GetComponent<RawImage>().material = material1;
             _logMessage.message = "indicator color: purple";
             _dataManager.SaveLogMessage(_logMessage);
 
         }
         else
         {
-            circle_center.GetComponent<RawImage>().material = material2;
+            _circle_center.GetComponent<RawImage>().material = material2;
             _logMessage.message = "indicator color: brown";
             _dataManager.SaveLogMessage(_logMessage);
         }
@@ -304,13 +324,13 @@ public class CircleControl : MonoBehaviour
     {
         if (t == 0)
         {
-            circle_right.SetActive(true);
+            _circle_right.SetActive(true);
             _logMessage.message = "target showing: right";
             _dataManager.SaveLogMessage(_logMessage);
 
 
 
-            if (circle_center.GetComponent<RawImage>().material == material1)
+            if (_circle_center.GetComponent<RawImage>().material == material1)
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: right";
                 ans = 1;
@@ -326,13 +346,13 @@ public class CircleControl : MonoBehaviour
         }
         else
         {
-            circle_left.SetActive(true);
+            _circle_left.SetActive(true);
             _logMessage.message = "target showing: left";
             _dataManager.SaveLogMessage(_logMessage);
 
             //output to console
 
-            if (circle_center.GetComponent<RawImage>().material == material1)
+            if (_circle_center.GetComponent<RawImage>().material == material1)
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: left";
                 ans = 0;
@@ -363,12 +383,12 @@ public class CircleControl : MonoBehaviour
 
 
         //center dot
-        circle_center.SetActive(true);
+        _circle_center.SetActive(true);
         _logMessage.message = "indicator showing";
         _dataManager.SaveLogMessage(_logMessage);
         yield return new WaitForSeconds(1.0f);
 
-        circle_center.SetActive(false);
+        _circle_center.SetActive(false);
         yield return new WaitForSeconds(0.2f);
 
     }
@@ -382,7 +402,7 @@ public class CircleControl : MonoBehaviour
             PlayerPrefs.SetInt("GetData", 1);
 
             //R_check
-            circle_right.SetActive(true);
+            _circle_right.SetActive(true);
             _logMessage.message = "R_test";
             _dataManager.SaveLogMessage(_logMessage);
             //when active, dot move to get the user's R_origin
@@ -393,7 +413,7 @@ public class CircleControl : MonoBehaviour
 
 
             //L_check
-            circle_left.SetActive(true);
+            _circle_left.SetActive(true);
             _logMessage.message = "L_test";
             _dataManager.SaveLogMessage(_logMessage);
             //when active, dot move to get the user's L_origin
@@ -440,14 +460,14 @@ public class CircleControl : MonoBehaviour
     public void UpdateText(string newText)
     {
         // 更新文本
-        BreakWords.text = newText;
+        _breakWords.text = newText;
 
     }
 
     private IEnumerator Take_A_Break()
     {
 
-        BreakWords.text = "休息下\n已經完成" + (count - 8 - 1).ToString() + "(剩" + (quiztimes - count + 9).ToString() + "題)\n按鍵繼續";
+        _breakWords.text = "休息下\n已經完成" + (count - 8 - 1).ToString() + "(剩" + (quiztimes - count + 9).ToString() + "題)\n按鍵繼續";
         waitingforinput = true;
 
 
@@ -456,7 +476,7 @@ public class CircleControl : MonoBehaviour
         {
             yield return null;
         }
-        BreakWords.text = "";
+        _breakWords.text = "";
         waitingforinput = false;
 
     }
@@ -467,7 +487,7 @@ public class CircleControl : MonoBehaviour
         while (!InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton) || !Input.anyKey)
         //while (!Input.anyKey)
         {
-            BreakWords.text = "";
+            _breakWords.text = "";
             yield return null;
         }
 
