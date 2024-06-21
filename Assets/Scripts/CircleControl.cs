@@ -44,6 +44,11 @@ public class CircleControl : MonoBehaviour
     public GameObject _endWords;
     public TMP_Text _breakWords;
 
+
+    public RectTransform _rightTarget;
+    public RectTransform _leftTarget;
+
+
     public Material material1;
     public Material material2;
 
@@ -56,7 +61,7 @@ public class CircleControl : MonoBehaviour
 
 
     //題數
-    int quiztimes = 180;
+    int numberOfTrial = 180;
 
     //題型
     int Q1 = 2;
@@ -103,6 +108,13 @@ public class CircleControl : MonoBehaviour
 
     public void GameStart()
     {
+        //Target position setting
+        _rightTarget.anchoredPosition = new Vector3(int.Parse(_targetLocation_X.text),
+            int.Parse(_targetLocation_Y.text), 0);
+        _leftTarget.anchoredPosition = new Vector3(-int.Parse(_targetLocation_X.text),
+            int.Parse(_targetLocation_Y.text), 0);
+        numberOfTrial = int.Parse(_inputTrialNum.text);
+
         _initialUI.SetActive(false);
         _introP1.SetActive(true);
         _gameReady = true;
@@ -125,7 +137,7 @@ public class CircleControl : MonoBehaviour
         _logMessage.message = "practice start";
         _dataManager.SaveLogMessage(_logMessage);
 
-        while (count <= (quiztimes + 8))
+        while (count <= (numberOfTrial + 8))
         {
             
             Roundoff = false;
@@ -264,7 +276,7 @@ public class CircleControl : MonoBehaviour
             count++;
 
             //quit
-            if (count > quiztimes + 8)
+            if (count > numberOfTrial + 8)
             {
                 _endWords.SetActive(true);
                 PlayerPrefs.SetInt("GetData", 0);
@@ -467,7 +479,7 @@ public class CircleControl : MonoBehaviour
     private IEnumerator Take_A_Break()
     {
 
-        _breakWords.text = "休息下\n已經完成" + (count - 8 - 1).ToString() + "(剩" + (quiztimes - count + 9).ToString() + "題)\n按鍵繼續";
+        _breakWords.text = "休息下\n已經完成" + (count - 8 - 1).ToString() + "(剩" + (numberOfTrial - count + 9).ToString() + "題)\n按鍵繼續";
         waitingforinput = true;
 
 

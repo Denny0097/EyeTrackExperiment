@@ -27,6 +27,12 @@ public class Correaction : MonoBehaviour
     float ColStep = 200;
     float canvas_dist = 100;
 
+    public TMP_InputField _targetLocation_X;
+    public TMP_InputField _targetLocation_Y;
+
+
+
+
     //控制模式：f:每兩秒換點 ＆ t:按左手按鈕換點
     bool ControlMode = false;
 
@@ -131,14 +137,16 @@ public class Correaction : MonoBehaviour
                     break;
 
                 case 10:
-                    target.anchoredPosition = new Vector3(100, 0, 0);
-                    _logMessage.message = "dot position(100,0," + canvas_dist.ToString() + "), GameTarget_Right";
+                    target.anchoredPosition = new Vector3(int.Parse(_targetLocation_X.text), int.Parse(_targetLocation_Y.text), 0);
+                    _logMessage.message = "dot position(" + _targetLocation_X.text +"," + _targetLocation_Y.text + ","
+                        + canvas_dist.ToString() + "), GameTarget_Right";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
                 case 11:
-                    target.anchoredPosition = new Vector3(-100, 0, 0);
-                    _logMessage.message = "dot position(-100,0," + canvas_dist.ToString() + "), GameTarget_Left";
+                    target.anchoredPosition = new Vector3(-int.Parse(_targetLocation_X.text), int.Parse(_targetLocation_Y.text), 0);
+                    _logMessage.message = "dot position(-" + _targetLocation_X.text + "," + _targetLocation_Y.text + ","
+                        + canvas_dist.ToString() + "), GameTarget_Left";
                     CorrData.SaveLogMessage(_logMessage);
 
                     break;
