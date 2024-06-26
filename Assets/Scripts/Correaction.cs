@@ -54,8 +54,7 @@ public class Correaction : MonoBehaviour
     {
         _logMessage.message = "order of presentation : 右 左 上 下 右上 右下 左上 左下 中";
         CorrData.SaveLogMessage(_logMessage);
-        currentPosition = target.anchoredPosition;
-        //GameStart();
+        GameStart();
     }
 
 
@@ -90,8 +89,11 @@ public class Correaction : MonoBehaviour
             int.Parse(_targetLocation_Y.text), 0);
         _leftTarget.anchoredPosition = new Vector3(-int.Parse(_targetLocation_X.text),
             int.Parse(_targetLocation_Y.text), 0);
+        currentPosition = target.anchoredPosition;
 
         _initialUI.SetActive(false);
+        _cameraUI.SetActive(true);
+
         _CorreactionStart = true;
         instruction.SetActive(true);
 
@@ -99,8 +101,8 @@ public class Correaction : MonoBehaviour
         _leftHandContr.SetActive(false);
         _intereactionMan.SetActive(false);
 
+
         StartCoroutine(TargetShow(currentPosition));
-        Debug.Log("TargetShow");
 
 
     }
@@ -110,8 +112,8 @@ public class Correaction : MonoBehaviour
     private IEnumerator TargetShow(Vector3 currentPosition)
     {
         yield return new WaitForSeconds(5.0f);
+        Debug.Log("TargetShow");
 
-        _CorreactionStart = true;
         instruction.SetActive(false);
         targetdot.SetActive(true);
         Debug.Log("Start");

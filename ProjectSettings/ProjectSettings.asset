@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: CIPH
-  productName: ProAnti_onVR
+  productName: ProAndAnti_onVR
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -135,7 +135,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 1
+  bundleVersion: 2
   preloadedAssets:
   - {fileID: 11400000, guid: d8d40172b16017141a4fb183deb0e03e, type: 2}
   - {fileID: 8728303228001387257, guid: 8be3e071a8210884d95e0c322a92d216, type: 2}
@@ -158,7 +158,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.DefaultCompany.TestTwoEyesDisplay
+    Android: com.CIPH.ProAndAnti_onVR
   buildNumber:
     Standalone: 0
     VisionOS: 0

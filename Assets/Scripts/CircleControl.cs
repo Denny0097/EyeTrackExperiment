@@ -48,6 +48,9 @@ public class CircleControl : MonoBehaviour
     public RectTransform _rightTarget;
     public RectTransform _leftTarget;
 
+    //
+    public Color _green;
+    public Color _red;
 
     public Material material1;
     public Material material2;
@@ -102,7 +105,7 @@ public class CircleControl : MonoBehaviour
         _introP1.SetActive(true);
         //LoadImageFromFile(CoverPath, _background);
         numberOfTrial = int.Parse(_inputTrialNum.text);
-        _background.gameObject.SetActive(true); 
+        //_background.gameObject.SetActive(true); 
         //_initialUI.SetActive(true);
         //VR controller appear
         _rightHandContr.SetActive(false);
@@ -117,7 +120,7 @@ public class CircleControl : MonoBehaviour
     private void Update()
     {
 
-        if ((Input.anyKey || InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton)) && !_gameStart && _gameReady)
+        if ((Input.anyKey || InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton)) && !_gameStart)
         //if (Input.anyKey &&!_gameStart)
         {
             _introP1.SetActive(false);
@@ -368,14 +371,14 @@ public class CircleControl : MonoBehaviour
     {
         if(c == 0)
         {
-            _circle_center.GetComponent<RawImage>().material = material1;
+            _circle_center.GetComponent<RawImage>().color = _green;
             _logMessage.message = "indicator color: Green";
             _dataManager.SaveLogMessage(_logMessage);
 
         }
         else
         {
-            _circle_center.GetComponent<RawImage>().material = material2;
+            _circle_center.GetComponent<RawImage>().color = _red;
             _logMessage.message = "indicator color: Red";
             _dataManager.SaveLogMessage(_logMessage);
         }
@@ -392,7 +395,7 @@ public class CircleControl : MonoBehaviour
 
 
 
-            if (_circle_center.GetComponent<RawImage>().material == material1)
+            if (_circle_center.GetComponent<RawImage>().color == _green)
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: right";
                 ans = 1;
@@ -414,7 +417,7 @@ public class CircleControl : MonoBehaviour
 
             //output to console
 
-            if (_circle_center.GetComponent<RawImage>().material == material1)
+            if (_circle_center.GetComponent<RawImage>().color == _green)
             {
                 _logMessage.message = "round" + (count - 8).ToString() + " answer: left";
                 ans = 0;
