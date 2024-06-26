@@ -9,7 +9,9 @@ using TMPro;
 
 public class Correaction : MonoBehaviour
 {
-   
+    public GameObject _initialUI;
+
+    public GameObject _cameraUI;
     public RectTransform target;
     public GameObject instruction;
     public GameObject targetdot;
@@ -27,9 +29,20 @@ public class Correaction : MonoBehaviour
     float ColStep = 200;
     float canvas_dist = 100;
 
+    //UI數值輸入
+    public TMP_InputField _inputTrialNum;//題數
     public TMP_InputField _targetLocation_X;
     public TMP_InputField _targetLocation_Y;
 
+    public RectTransform _rightTarget;
+    public RectTransform _leftTarget;
+
+
+    public GameObject _rightHandContr;
+    public GameObject _leftHandContr;
+    public GameObject _intereactionMan;
+
+    Vector3 currentPosition;
 
 
 
@@ -39,53 +52,84 @@ public class Correaction : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instruction.SetActive(true);
         _logMessage.message = "order of presentation : 右 左 上 下 右上 右下 左上 左下 中";
         CorrData.SaveLogMessage(_logMessage);
-
+        currentPosition = target.anchoredPosition;
+        //GameStart();
     }
+
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 currentPosition = target.anchoredPosition;
-
-        
-
-        if ((Input.anyKey||InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton))&&!_CorreactionStart)
-        {
-            _CorreactionStart = true;
-            instruction.SetActive(true);
-            StartCoroutine(TargetShow(currentPosition));
-        }
+       
+        //if ((Input.anyKey||InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Right, CommonUsages.triggerButton))&&!_CorreactionStart)
+        //{
+        //    _CorreactionStart = true;
+        //    instruction.SetActive(true);
+        //    StartCoroutine(TargetShow(currentPosition));
+        //}
 
         //設定是否開啟ControlMode
-        if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Left, CommonUsages.triggerButton)&&ControlMode == false)
-        {
-            ControlMode = true;
-        }
+        //if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Left, CommonUsages.triggerButton)&&ControlMode == false)
+        //{
+        //    ControlMode = true;
+        //}
 
-        if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Left, CommonUsages.triggerButton))
-        {
-            ControlMode = true;
-        }
+        //if (InputDeviceControl.KeyDown(InputDeviceControl.ControlDevice.Left, CommonUsages.triggerButton))
+        //{
+        //    ControlMode = true;
+        //}
 
     }
 
+    public void GameStart()
+    {
+        //Target position setting
+        _rightTarget.anchoredPosition = new Vector3(int.Parse(_targetLocation_X.text),
+            int.Parse(_targetLocation_Y.text), 0);
+        _leftTarget.anchoredPosition = new Vector3(-int.Parse(_targetLocation_X.text),
+            int.Parse(_targetLocation_Y.text), 0);
+
+        _initialUI.SetActive(false);
+        _CorreactionStart = true;
+        instruction.SetActive(true);
+
+        _rightHandContr.SetActive(false);
+        _leftHandContr.SetActive(false);
+        _intereactionMan.SetActive(false);
+
+        StartCoroutine(TargetShow(currentPosition));
+        Debug.Log("TargetShow");
+
+
+    }
+
+
+
     private IEnumerator TargetShow(Vector3 currentPosition)
     {
+        yield return new WaitForSeconds(5.0f);
+
+        _CorreactionStart = true;
         instruction.SetActive(false);
+        targetdot.SetActive(true);
+        Debug.Log("Start");
+
         PlayerPrefs.SetInt("GetData", 1);
 
         while (count <= 11)
         {
+            Debug.Log("Counting");
 
             switch (count)
             {
                 case 1:
+                    target.anchoredPosition = new Vector3(RowStep, 0, 0);
                     _logMessage.message = "dot position(" + RowStep.ToString() + ",0," + canvas_dist.ToString() + "), right";
                     CorrData.SaveLogMessage(_logMessage);
-                    yield return null;
+
+
                     break;
                 case 2:
                     target.anchoredPosition = new Vector3(-RowStep, 0, 0);
@@ -148,8 +192,8 @@ public class Correaction : MonoBehaviour
                     _logMessage.message = "dot position(-" + _targetLocation_X.text + "," + _targetLocation_Y.text + ","
                         + canvas_dist.ToString() + "), GameTarget_Left";
                     CorrData.SaveLogMessage(_logMessage);
-
-                    break;
+                    
+                    break; 
 
 
             }
@@ -168,7 +212,9 @@ public class Correaction : MonoBehaviour
         PlayerPrefs.SetInt("GetData", 0);
         breakword.text = "矯正結束\n準備開始實驗說明\n等待期間請勿按任何按鍵";
         yield return new WaitForSeconds(4.0f);
+        _cameraUI.SetActive(true);
         breakword.text = "";
+
         gamecontrol.SetActive(true);
         self.SetActive(false);
 

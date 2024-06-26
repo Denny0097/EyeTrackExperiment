@@ -60,6 +60,12 @@ public class CircleControl : MonoBehaviour
     public TMP_InputField _targetLocation_Y;
 
 
+    public GameObject _rightHandContr;
+    public GameObject _leftHandContr;
+    public GameObject _intereactionMan;
+
+
+
     //題數
     int numberOfTrial = 180;
 
@@ -79,15 +85,33 @@ public class CircleControl : MonoBehaviour
 
     public DataManager _dataManager; 
     public LogMessage _logMessage = new LogMessage();
-    
+
+
+    public RawImage _background;
+    private string CoverPath = Application.persistentDataPath + "Image/Background.png";
+
+
 
     bool isGazeMid = false;
 
+
+
+
     private void Start()
     {
-        _initialUI.SetActive(true);
+        _introP1.SetActive(true);
+        //LoadImageFromFile(CoverPath, _background);
+        numberOfTrial = int.Parse(_inputTrialNum.text);
+        _background.gameObject.SetActive(true); 
+        //_initialUI.SetActive(true);
+        //VR controller appear
+        _rightHandContr.SetActive(false);
+        _leftHandContr.SetActive(false);
+        _intereactionMan.SetActive(false);
         BluetoothManager.instance.ConnectToDevice_Send("connect");
-        
+        _gameReady = true;
+
+
     }
 
     private void Update()
@@ -106,20 +130,46 @@ public class CircleControl : MonoBehaviour
         
     }
 
-    public void GameStart()
+
+    private void LoadImageFromFile(string filePath, RawImage image)
     {
-        //Target position setting
-        _rightTarget.anchoredPosition = new Vector3(int.Parse(_targetLocation_X.text),
-            int.Parse(_targetLocation_Y.text), 0);
-        _leftTarget.anchoredPosition = new Vector3(-int.Parse(_targetLocation_X.text),
-            int.Parse(_targetLocation_Y.text), 0);
-        numberOfTrial = int.Parse(_inputTrialNum.text);
 
-        _initialUI.SetActive(false);
-        _introP1.SetActive(true);
-        _gameReady = true;
-
+        if (File.Exists(filePath))
+        {
+            byte[] fileData = File.ReadAllBytes(filePath);
+            Texture2D texture = new Texture2D(2, 2);
+            if (texture.LoadImage(fileData))
+            {
+                image.texture = texture;
+                image.SetNativeSize(); // 可選，根據圖片的原始尺寸調整 RawImage 的大小
+            }
+            else
+            {
+                Debug.LogError("Failed to load texture from " + filePath);
+            }
+        }
+        else
+        {
+            Debug.LogError("File does not exist at " + filePath);
+        }
     }
+
+
+
+    //public void GameStart()
+    //{
+    //    //Target position setting
+    //    _rightTarget.anchoredPosition = new Vector3(int.Parse(_targetLocation_X.text),
+    //        int.Parse(_targetLocation_Y.text), 0);
+    //    _leftTarget.anchoredPosition = new Vector3(-int.Parse(_targetLocation_X.text),
+    //        int.Parse(_targetLocation_Y.text), 0);
+    //    numberOfTrial = int.Parse(_inputTrialNum.text);
+
+    //    _initialUI.SetActive(false);
+    //    _introP1.SetActive(true);
+    //    _gameReady = true;
+
+    //}
 
 
     private IEnumerator ShowAndHideUI()
@@ -319,14 +369,14 @@ public class CircleControl : MonoBehaviour
         if(c == 0)
         {
             _circle_center.GetComponent<RawImage>().material = material1;
-            _logMessage.message = "indicator color: purple";
+            _logMessage.message = "indicator color: Green";
             _dataManager.SaveLogMessage(_logMessage);
 
         }
         else
         {
             _circle_center.GetComponent<RawImage>().material = material2;
-            _logMessage.message = "indicator color: brown";
+            _logMessage.message = "indicator color: Red";
             _dataManager.SaveLogMessage(_logMessage);
         }
 
