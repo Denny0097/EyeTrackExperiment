@@ -1,7 +1,7 @@
 # EyeTrackExperiment
 vcl eyetrack
-## Procedural
-![image](https://github.com/Denny0097/EyeTrackExperiment/blob/main/123.png)
+## Procedure
+![image](https://github.com/user-attachments/assets/c8fb51c2-b2bc-44bd-b779-637c99515f47)
 ![image](https://github.com/Denny0097/EyeTrackExperiment/blob/main/未命名.png)
 
 
@@ -20,3 +20,6 @@ vcl eyetrack
 
 ##Output
 ![image](https://github.com/user-attachments/assets/9bfbdf83-2680-41ff-844a-f8b54eee4df7)
+
+records:
+![image](https://github.com/user-attachments/assets/4524ea9d-ebf6-490d-8ec3-3f9565b0bc00)
